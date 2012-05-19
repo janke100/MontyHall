@@ -1,0 +1,245 @@
+<html>
+<head>
+<script>
+
+var Output="";
+var OnFirstGuess=0;
+var OnSecondGuess=0;
+
+function HidePrize(N) {
+
+	var doors=[];
+	
+	for (var i=0;i<N;i++) doors.push(0);
+	
+	var prizeIndex=Math.floor(Math.random()*N);
+	
+	doors[prizeIndex]=1;
+	
+	return doors;
+}
+
+function MakeGuess(N) {
+
+	var guessIndex=Math.floor(Math.random()*N);
+	
+	return guessIndex;
+}
+
+function OpenGoatDoor(N,doors,guess) {
+
+	var goatdoor=0;
+	
+	while (!((doors[goatdoor]==0) && (goatdoor!=guess))) {	
+		goatdoor=Math.floor(Math.random()*N);	
+	}
+		
+	return goatdoor;
+}
+
+function MakeSecondGuess(N,doors,guess,goatdoor) {
+
+	var secondGuess=0;
+	
+	while (!((goatdoor!=secondGuess) && (guess!=secondGuess) )) {	
+		secondGuess=Math.floor(Math.random()*N);	
+	}
+		
+	return secondGuess;	
+}
+
+function RenderInitialDoors(doors) {
+	
+	var out="<table>";
+	
+	out+="<tr>";
+	
+	for (var i=0;i<doors.length;i++) {	
+	
+		if (doors[i]==0) out+="<td><img src='images/goat.png'><br><img src='images/noguess.png'></td>"; else out+="<td><img src='images/prize.png'><br><img src='images/noguess.png'></td>";		
+	
+	}
+	
+	out+="</tr>";
+	
+	out+="</table>"
+		
+	return out;
+	
+}
+
+function RenderWithGuess(doors,guess) {
+	
+	var out="<table>";
+	
+	out+="<tr>";
+	
+	for (var i=0;i<doors.length;i++) {	
+		if (doors[i]==0) {
+			if (guess==i) out+="<td><img src='images/goat.png'><br><img src='images/guess.png'></td>"; else out+="<td><img src='images/goat.png'><br><img src='images/noguess.png'></td>";
+		} else {
+			if (guess==i) out+="<td><img src='images/prize.png'><br><img src='images/guess.png'></td>"; else out+="<td><img src='images/prize.png'><br><img src='images/noguess.png'></td>";
+		}			
+	}
+	
+	out+="</tr>";
+	
+	out+="</table>"
+		
+	return out;
+}
+
+function RenderWithOpenedGoatDoor(doors,guess,goatdoor) {
+	
+	var out="<table>";
+	
+	out+="<tr>";
+	
+	for (var i=0;i<doors.length;i++) {	
+		
+		out+="<td>";
+		
+		if ((doors[i]==0) && (goatdoor!=i)) out+="<img src='images/goat.png'>";
+		if ((doors[i]==0) && (goatdoor==i)) out+="<img src='images/goat_door_opened.png'>";
+		if ((doors[i]==1)) out+="<img src='images/prize.png'>";
+		if (guess==i) out+="<br><img src='images/guess.png'>"; else out+="<br><img src='images/noguess.png'>"; 
+			
+		out+="</td>";					
+	}
+	
+	out+="</tr>";
+	
+	out+="</table>"
+		
+	return out;
+	
+}
+
+function RenderWithSecondGuess(doors,guess,goatdoor,secondGuess) {
+	
+	var out="<table>";
+	
+	out+="<tr>";
+	
+	for (var i=0;i<doors.length;i++) {	
+		
+		out+="<td>";
+		
+		if ((doors[i]==0) && (goatdoor!=i)) out+="<img src='images/goat.png'>";
+		if ((doors[i]==0) && (goatdoor==i)) out+="<img src='images/goat_door_opened.png'>";
+		if ((doors[i]==1)) out+="<img src='images/prize.png'>";
+		if (secondGuess==i) out+="<br><img src='images/guess.png'>"; else out+="<br><img src='images/noguess.png'>"; 
+			
+		out+="</td>";					
+	}
+	
+	out+="</tr>";
+	
+	out+="</table>"
+		
+	return out;
+	
+}
+
+function RenderCurrentTrial(doors,guess,goatdoor,secondGuess,total) {
+	
+	var out1=RenderInitialDoors(doors);
+	var out2=RenderWithGuess(doors,guess);
+	var out3=RenderWithOpenedGoatDoor(doors,guess,goatdoor);
+	var out4=RenderWithSecondGuess(doors,guess,goatdoor,secondGuess);
+	
+	var out="";
+	out+="<tr>";
+	out+="<td>"+out1+"</td>";
+	out+="<td>"+out2+"</td>";
+	out+="<td>"+out3+"</td>";
+	out+="<td>"+out4+"</td>";	
+	
+	out+="<td align='center'>";
+	
+		if (doors[guess]==1) out+="<img src='images/check.png'>";
+		out+="<br>Total:"+OnFirstGuess;
+		out+="<br>"+OnFirstGuess/(total+1);
+	
+	out+="</td>";
+	
+	out+="<td align='center'>";
+	
+		if (doors[secondGuess]==1) out+="<img src='images/check.png'>";
+		out+="<br>Total:"+OnSecondGuess;
+		out+="<br>"+OnSecondGuess/(total+1)
+	
+	out+="</td>";
+	
+		
+	
+	out+="</tr>";	
+	out+="";
+	
+	return out;
+}
+
+function RenderHeader() {
+	
+	var out=""
+	out+="<tr>";
+	out+="<td>INITIAL</td>";
+	out+="<td>FIRST GUESS</td>";
+	out+="<td>REVEAL GOAT</td>";
+	out+="<td>SECOND GUESS</td>";
+	out+="<td align='center'>WITH FIRST GUESS</td>";
+	out+="<td align='center'>WITH SECOND GUESS</td>";	
+	out+="</tr>";	
+	
+	return out;
+}
+
+function RunTrial(N,total) {
+
+	var doors=HidePrize(N);
+	var guess=MakeGuess(N)
+	var goatdoor=OpenGoatDoor(N,doors,guess);
+	var secondGuess=MakeSecondGuess(N,doors,guess,goatdoor);
+	
+	if (doors[guess]==1) OnFirstGuess++;
+	if (doors[secondGuess]==1) OnSecondGuess++;	
+	
+	var out=RenderCurrentTrial(doors,guess,goatdoor,secondGuess,total);
+	
+	return out;
+	
+}
+
+function RunTrials() {
+
+	Output="";
+	OnFirstGuess=0;
+	OnSecondGuess=0;
+
+	var N=document.getElementById("doors").value;
+	var TrialsNum=document.getElementById("trials").value;
+	
+	Output="<table border='1'>";
+	
+	Output+=RenderHeader();
+
+	for (var i=0;i<TrialsNum;i++) {
+		Output+=RunTrial(N,i);
+	}
+	
+	Output+="</table>";
+	
+	document.getElementById("output").innerHTML=Output;
+
+
+}
+
+</script>
+</head>
+<body >
+Number of Trials:<input type="text" id="trials" value="100">
+Number of Doors:<input type="text" id="doors" value="3">
+<input type="button" value="GO" onclick="RunTrials()">
+<div id="output"></div>
+</body>
+</html>
